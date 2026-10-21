@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Simple Gmail</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.png" width="20" height="20" alt="">
+    <h1>Simple Gmail</h1>
+    <label class="switch" title="Turn Simple Gmail on / off (Alt+Shift+S)">
+      <input type="checkbox" data-key="enabled">
+      <span></span>
+    </label>
+  </header>
+
+  <main id="options">
+    <section>
+      <div class="row">
+        <span>Theme</span>
+        <div class="segmented" data-key="dark">
+          <button value="off">Light</button>
+          <button value="on">Dark</button>
+          <button value="system">Auto</button>
+        </div>
+      </div>
+      <div class="row">
+        <span>Width</span>
+        <div class="segmented" data-key="width">
+          <button value="narrow">Narrow</button>
+          <button value="normal">Normal</button>
+          <button value="wide">Wide</button>
+        </div>
+      </div>
+      <div class="row">
+        <span>Rows</span>
+        <div class="segmented" data-key="rowSpace">
+          <button value="tight">Tight</button>
+          <button value="comfy">Comfy</button>
+          <button value="roomy">Roomy</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <label class="row">
+        <span>Group mail by date</span>
+        <span class="switch"><input type="checkbox" data-key="dateGroups"><span></span></span>
+      </label>
+      <label class="row">
+        <span>Floating compose button</span>
+        <span class="switch"><input type="checkbox" data-key="floatingCompose"><span></span></span>
+      </label>
+      <label class="row">
+        <span>Hide toolbar until needed</span>
+        <span class="switch"><input type="checkbox" data-key="quietToolbar"><span></span></span>
+      </label>
+      <label class="row">
+        <span>Checkbox &amp; star on hover only</span>
+        <span class="switch"><input type="checkbox" data-key="quietControls"><span></span></span>
+      </label>
+      <label class="row">
+        <span>Hide side panels &amp; app rail</span>
+        <span class="switch"><input type="checkbox" data-key="hideSidePanels"><span></span></span>
+      </label>
+    </section>
+  </main>
+
+  <footer>Menu ☰ opens folders &amp; labels · <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> toggles</footer>
+  <script src="popup.js"></script>
+</body>
+</html>

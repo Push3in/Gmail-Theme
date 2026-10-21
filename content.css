@@ -1,0 +1,454 @@
+/*
+ * Simple Gmail — every rule is scoped to html.sg-on so turning the extension
+ * off restores Gmail exactly.
+ *
+ * Gmail's class names are obfuscated. The ones used here have been stable for
+ * years, but if Gmail changes something and a piece reappears, this file is
+ * the place to adjust:
+ *   .aqn          left navigation (folders, labels, Compose)
+ *   .aeN          Mail / Chat / Meet app rail
+ *   .T-I-KE.L3    Gmail's Compose button (older Gmail: [gh="cm"])
+ *   tr.zA         a conversation row (.zE unread, .yO read)
+ *   td.xW         date column        .pG importance marker
+ *   .G-atb        action toolbar     table.Bs / td.Bu  thread layout
+ */
+
+html.sg-on {
+  --sg-width: 1200px;
+  --sg-thread-width: 900px;
+  --sg-panel: #ffffff;
+  --sg-muted: #80868b;
+  --sg-read: #5f6368;
+  --sg-line: rgba(0, 0, 0, 0.08);
+  --sg-hover: rgba(0, 0, 0, 0.045);
+  --sg-focus: rgba(0, 0, 0, 0.03);
+  --sg-selected: #e8f0fe;
+  --sg-accent: #d93025;
+  --sg-fab: #ffffff;
+}
+
+/* Gmail's own dark theme (detected by content.js from the text colour) */
+html.sg-on.sg-gmail-dark {
+  --sg-panel: #1f1f1f;
+  --sg-muted: #9aa0a6;
+  --sg-read: #bdc1c6;
+  --sg-line: rgba(255, 255, 255, 0.12);
+  --sg-hover: rgba(255, 255, 255, 0.08);
+  --sg-focus: rgba(255, 255, 255, 0.05);
+  --sg-selected: rgba(138, 180, 248, 0.18);
+  --sg-accent: #f28b82;
+  --sg-fab: #2d2e30;
+}
+
+/* ---------- canvas: one flat surface in Gmail's theme colour ---------- */
+
+html.sg-on .bkK,
+html.sg-on .bkK > .nH,
+html.sg-on div[role="main"],
+html.sg-on .aeF,
+html.sg-on .nH.ar4 {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* ---------- header: menu, centered search, avatar ---------- */
+
+html.sg-on header {
+  border-bottom: 1px solid var(--sg-line) !important;
+}
+
+/* Gmail logo, Google apps grid, Support, Gemini, Upgrade */
+html.sg-on header a[href$="#inbox"]:has(img),
+html.sg-on header a[href*="about/products"],
+html.sg-on header a[href*="one.google.com"],
+html.sg-on header [aria-label="Support"],
+html.sg-on header [data-tooltip="Support"],
+html.sg-on header [aria-label*="Gemini" i],
+html.sg-on header [data-tooltip*="Gemini" i] {
+  display: none !important;
+}
+
+/*
+ * The search bar stays in Gmail's header flow (Gmail positions the search
+ * options panel and suggestions from it, so pinning it with position: fixed
+ * made those open in the wrong place). content.js sets --sg-search-left, the
+ * left margin that centres it on the window. Only the menu and logo sit to
+ * its left and they load first, so the bar doesn't slide while the header's
+ * right side loads; auto margins (before content.js measures) would.
+ */
+html.sg-on header form[role="search"] {
+  width: min(560px, calc(100vw - 360px)) !important;
+  max-width: none !important;
+  margin-left: var(--sg-search-left, auto) !important;
+  margin-right: 0 !important;
+  border-radius: 8px !important;
+}
+
+/* Search options panel (filter icon): lives at page level, so line it up
+   with the bar using the position content.js measured */
+html.sg-on .ZF-Av:has(> .SK) {
+  left: var(--sg-search-x) !important;
+}
+
+html.sg-on .ZF-Av > .SK {
+  width: var(--sg-search-w) !important;
+  box-sizing: border-box;
+}
+
+/* ---------- left navigation becomes a slide-over panel ---------- */
+
+/*
+ * The panel stays rendered, parked off-screen, and slides in with a
+ * transform. Toggling display made the browser lay out Gmail's whole
+ * folder list on every open, which was laggy; a transform only moves
+ * pixels. visibility keeps the parked panel out of reach of clicks and Tab,
+ * and flips only after the slide-out finishes.
+ * [data-sg-nav] is a fallback for Gmail versions without .aqn (content.js
+ * finds it from Compose). Gmail also has a second, empty .aqn.
+ */
+html.sg-on .aqn:not(:has(a)) {
+  display: none !important;
+}
+
+html.sg-on .aqn:has(a),
+html.sg-on [data-sg-nav] {
+  display: block !important;
+  position: fixed !important;
+  top: var(--sg-header-bottom, 64px);
+  left: 0;
+  bottom: 0;
+  width: 256px !important;
+  z-index: 1000;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--sg-panel) !important;
+  border-radius: 0 12px 0 0;
+  padding-top: 8px;
+  transform: translateX(-100%);
+  visibility: hidden;
+  box-shadow: none;
+  will-change: transform;
+  transition:
+    transform var(--sg-spring-panel-duration) var(--sg-spring-panel),
+    box-shadow var(--sg-spring-panel-duration) var(--sg-spring-panel),
+    visibility 0s linear var(--sg-spring-panel-duration);
+}
+
+html.sg-on.sg-nav-open .aqn:has(a),
+html.sg-on.sg-nav-open [data-sg-nav] {
+  transform: none;
+  visibility: visible;
+  box-shadow: 1px 0 0 var(--sg-line), 8px 0 24px -16px rgba(0, 0, 0, 0.25);
+  transition:
+    transform var(--sg-spring-panel-duration) var(--sg-spring-panel),
+    box-shadow var(--sg-spring-panel-duration) var(--sg-spring-panel),
+    visibility 0s;
+}
+
+/* ---------- side panels (Calendar / Keep / Tasks, Chat & Meet rail) ---------- */
+
+html.sg-on.sg-hide-panels .aeN,
+html.sg-on.sg-hide-panels div[role="complementary"],
+html.sg-on.sg-hide-panels .bAw,
+html.sg-on.sg-hide-panels .brC-aT5-aOt-Jw,
+html.sg-on [data-sg-hide] {
+  display: none !important;
+}
+
+/* ---------- centered content column ---------- */
+
+html.sg-on div[role="main"] {
+  width: 100% !important;
+  max-width: var(--sg-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/*
+ * Views settle in on a Motion spring. CSS animations restart whenever an
+ * element goes from hidden to shown, and Gmail shows/hides a main region and
+ * toolbar per view, so this runs on first load and on every inbox <-> email
+ * switch without any script. `backwards` leaves no transform behind, so
+ * Gmail's fixed-position popups are unaffected once it settles.
+ */
+@keyframes sg-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes sg-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+html.sg-on div[role="main"] {
+  animation: sg-enter var(--sg-spring-enter-duration) var(--sg-spring-enter) backwards;
+}
+
+html.sg-on .G-atb {
+  animation: sg-fade var(--sg-spring-enter-duration) var(--sg-spring-enter) backwards;
+}
+
+/* ---------- quiet toolbar: appears on hover or when mail is selected ---------- */
+
+/*
+ * content.js sizes the toolbar to the content below it (the email list, or
+ * the open mail card) with inline styles; Gmail's own sizing applies until then.
+ */
+html.sg-on .G-atb {
+  border: 0 !important;
+  background: transparent !important;
+  box-sizing: border-box;
+}
+
+html.sg-on.sg-quiet-toolbar:not(.sg-thread-view):not(.sg-has-selection) .G-atb {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+html.sg-on.sg-quiet-toolbar .G-atb:hover,
+html.sg-on.sg-quiet-toolbar .G-atb:focus-within {
+  opacity: 1 !important;
+}
+
+/* ---------- category tabs: small uppercase text ---------- */
+
+html.sg-on div[role="main"] [role="tab"] {
+  background: transparent !important;
+  box-shadow: none !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 12px !important;
+  color: var(--sg-muted) !important;
+}
+
+html.sg-on div[role="main"] [role="tab"][aria-selected="true"] {
+  color: var(--sg-accent) !important;
+}
+
+html.sg-on div[role="main"] [role="tab"] img,
+html.sg-on div[role="main"] [role="tab"] svg {
+  display: none !important;
+}
+
+/* ---------- conversation rows ---------- */
+
+/*
+ * Gmail's list isn't a real table: tbody is a block and each tr.zA is a flex
+ * row (10px padding top/bottom) whose cells are flex items. So:
+ *  - the hover / focus / selected "pill" is painted on the row itself, which
+ *    covers its padding and takes a border-radius;
+ *  - extra space is a transparent border on every cell, which grows the row
+ *    evenly without moving any cell's contents relative to the others.
+ * --sg-row-space is set from the popup's Rows option.
+ */
+html.sg-on {
+  --sg-radius: 10px;
+  --sg-row-space: 3px;
+}
+
+html.sg-on tr.zA {
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: var(--sg-radius);
+  background-color: transparent !important;
+  transition: background-color var(--sg-spring-hover-duration) var(--sg-spring-hover) !important;
+}
+
+html.sg-on tr.zA > td {
+  border-top: var(--sg-row-space) solid transparent !important;
+  border-bottom: var(--sg-row-space) solid transparent !important;
+  background-color: transparent !important;
+}
+
+/* Gmail's keyboard-focused row (j/k) */
+html.sg-on tr.zA.btb {
+  background-color: var(--sg-focus) !important;
+}
+
+/* Quick in, spring out */
+html.sg-on tr.zA:hover {
+  background-color: var(--sg-hover) !important;
+  transition-duration: 100ms !important;
+}
+
+html.sg-on tr.zA.x7 {
+  background-color: var(--sg-selected) !important;
+}
+
+/* Gmail paints its hover buttons on their own swatch; let the pill show through */
+html.sg-on tr.zA:hover ul,
+html.sg-on tr.zA:hover li {
+  background-color: transparent !important;
+}
+
+/* Gmail's blue 3px focus stripe; the .btb pill above replaces it */
+html.sg-on tr.zA > td.PF::before {
+  opacity: 0 !important;
+}
+
+/* Read mail recedes; unread stays bold */
+html.sg-on tr.zA.yO {
+  color: var(--sg-read);
+}
+
+/*
+ * Quiet controls: checkbox and star appear on hover, and stay when starred,
+ * checked, or while any mail is selected.
+ */
+html.sg-on tr.zA [role="checkbox"],
+html.sg-on tr.zA .T-KT {
+  transition:
+    opacity var(--sg-spring-hover-duration) var(--sg-spring-hover),
+    transform var(--sg-spring-pop-duration) var(--sg-spring-pop);
+}
+
+html.sg-on.sg-quiet-controls:not(.sg-has-selection) tr.zA:not(:hover):not(.btb) [role="checkbox"]:not([aria-checked="true"]),
+html.sg-on.sg-quiet-controls tr.zA:not(:hover):not(.btb) .T-KT:not(.T-KT-Jp) {
+  opacity: 0;
+}
+
+/* Star and checkbox: a small spring pop on hover */
+html.sg-on tr.zA [role="checkbox"]:hover,
+html.sg-on tr.zA .T-KT:hover {
+  transform: scale(1.18);
+}
+
+html.sg-on tr.zA [role="checkbox"]:active,
+html.sg-on tr.zA .T-KT:active {
+  transform: scale(0.9);
+  transition-duration: 80ms;
+}
+
+/* Importance markers add noise */
+html.sg-on tr.zA .pG,
+html.sg-on tr.zA td.WA {
+  display: none !important;
+}
+
+/* Muted snippet text */
+html.sg-on tr.zA .y2 {
+  color: var(--sg-muted) !important;
+}
+
+/* ---------- date group labels (tr.sg-group-row inserted by content.js) ---------- */
+
+/* Block, like Gmail's own rows, so the label spans the list's full width */
+html.sg-on tr.sg-group-row {
+  display: block;
+  pointer-events: none;
+}
+
+html.sg-on tr.sg-group-row > td {
+  display: block;
+  box-sizing: border-box;
+  height: 48px;
+  padding: 20px 0 8px 12px;
+  border-bottom: 1px solid var(--sg-line);
+  vertical-align: bottom;
+  white-space: nowrap;
+  font: 500 13px/1 "Google Sans", Roboto, Arial, sans-serif;
+  color: var(--sg-muted);
+}
+
+/* ---------- thread view: centered reading column ---------- */
+
+html.sg-on table.Bs {
+  max-width: var(--sg-thread-width) !important;
+  margin: 0 auto !important;
+}
+
+/* Right-hand column next to a thread (contacts card, ads) */
+html.sg-on table.Bs td.Bu:not(:first-child) {
+  display: none !important;
+}
+
+/* ---------- floating compose button ---------- */
+
+#sg-compose {
+  display: none;
+}
+
+html.sg-on.sg-fab-on #sg-compose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--sg-fab);
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3), 0 4px 12px rgba(60, 64, 67, 0.15);
+  cursor: pointer;
+  z-index: 999;
+  transition:
+    transform var(--sg-spring-fab-duration) var(--sg-spring-fab),
+    box-shadow var(--sg-spring-hover-duration) var(--sg-spring-hover);
+}
+
+html.sg-on.sg-fab-on #sg-compose:hover {
+  box-shadow: 0 2px 6px rgba(60, 64, 67, 0.3), 0 8px 24px rgba(60, 64, 67, 0.2);
+  transform: scale(1.08);
+}
+
+html.sg-on.sg-fab-on #sg-compose:active {
+  transform: scale(0.94);
+  transition-duration: 100ms, 100ms;
+}
+
+html.sg-on.sg-fab-on #sg-compose svg {
+  transition: transform var(--sg-spring-fab-duration) var(--sg-spring-fab);
+}
+
+html.sg-on.sg-fab-on #sg-compose:hover svg {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.sg-on * {
+    transition-duration: 0s !important;
+  }
+
+  html.sg-on div[role="main"],
+  html.sg-on .G-atb {
+    animation: none !important;
+  }
+}
+
+html.sg-on.sg-fab-on #sg-compose:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: 3px;
+}
+
+/* ---------- dark mode: invert the page, restore media ---------- */
+
+/*
+ * The page is inverted and softened: invert(1) then contrast(0.84) turns
+ * white into #141414 rather than pure black (same as invert(0.92)).
+ * hue-rotate keeps colours roughly their own hue. Media then gets the exact
+ * reverse, in reverse order, so photos and logos look as they should; a
+ * plain invert(1) on media couldn't undo invert(0.92) and left them washed
+ * out.
+ * Skipped when Gmail's own theme is already dark (sg-gmail-dark), where
+ * inverting would turn the page light again.
+ */
+html.sg-on.sg-dark:not(.sg-gmail-dark) {
+  filter: invert(1) contrast(0.84) hue-rotate(180deg);
+  background: #ffffff;
+}
+
+html.sg-on.sg-dark:not(.sg-gmail-dark) :is(img, video, picture, canvas, iframe, [style*="background-image"], #sg-compose svg) {
+  filter: hue-rotate(180deg) contrast(1.1905) invert(1);
+}
+
+/* Media inside media (e.g. an <img> in a <picture>) must not be restored twice */
+html.sg-on.sg-dark:not(.sg-gmail-dark) :is(picture, [style*="background-image"]) :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
+  filter: none;
+}
