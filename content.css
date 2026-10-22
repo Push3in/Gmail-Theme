@@ -335,22 +335,30 @@ html.sg-on tr.zA .y2 {
   color: var(--sg-muted) !important;
 }
 
-/* ---------- date group labels (tr.sg-group-row inserted by content.js) ---------- */
+/* ---------- date group labels (data-sg-group set by content.js) ---------- */
 
-/* Block, like Gmail's own rows, so the label spans the list's full width */
-html.sg-on tr.sg-group-row {
-  display: block;
-  pointer-events: none;
+/*
+ * Drawn above the first row of each group, in space opened by a margin, so
+ * the hover pill stays on the row. No extra rows: Gmail finds the clicked
+ * conversation by row position, and an inserted row shifted every click.
+ */
+html.sg-on tr.zA[data-sg-group] {
+  position: relative;
+  margin-top: 48px;
 }
 
-html.sg-on tr.sg-group-row > td {
-  display: block;
+html.sg-on tr.zA[data-sg-group]::before {
+  content: attr(data-sg-group);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
   box-sizing: border-box;
   height: 48px;
   padding: 20px 0 8px 12px;
   border-bottom: 1px solid var(--sg-line);
-  vertical-align: bottom;
   white-space: nowrap;
+  pointer-events: none;
   font: 500 13px/1 "Google Sans", Roboto, Arial, sans-serif;
   color: var(--sg-muted);
 }

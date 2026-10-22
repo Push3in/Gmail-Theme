@@ -271,30 +271,22 @@
           previous = label;
           first = false;
         }
-        const before = row.previousElementSibling;
-        const header = before && before.classList.contains("sg-group-row") ? before : null;
-        if (show && !header) row.before(groupRow(label));
-        else if (show && header.textContent !== label) header.firstChild.textContent = label;
-        else if (!show && header) header.remove();
-      }
-      // Headers whose rows Gmail removed or re-rendered.
-      for (const header of body.querySelectorAll(":scope > tr.sg-group-row")) {
-        const next = header.nextElementSibling;
-        if (!enabled || !next || !next.matches("tr.zA")) header.remove();
+        // The label is drawn by CSS from this attribute. Never insert rows:
+        // Gmail maps a clicked row to a conversation by its position, so an
+        // extra row above it opened the conversation below.
+        if (show) {
+          if (row.getAttribute("data-sg-group") !== label) row.setAttribute("data-sg-group", label);
+        } else if (row.hasAttribute("data-sg-group")) {
+          row.removeAttribute("data-sg-group");
+        }
       }
     }
-  }
-
-  // A separate label row, so Gmail's own rows keep their layout.
-  function groupRow(label) {
-    const row = document.createElement("tr");
-    row.className = "sg-group-row";
-    row.setAttribute("aria-hidden", "true");
-    const cell = document.createElement("td");
-    cell.colSpan = 99;
-    cell.textContent = label;
-    row.appendChild(cell);
-    return row;
+    // Rows from a previous scan that turned the feature off or left the list.
+    if (!enabled) {
+      for (const row of document.querySelectorAll("tr[data-sg-group]")) {
+        row.removeAttribute("data-sg-group");
+      }
+    }
   }
 
   // ---------- slide-over navigation (hamburger) ----------
