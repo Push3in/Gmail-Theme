@@ -333,6 +333,13 @@ html.sg-on tr.zA td.WA {
 /* Muted snippet text */
 html.sg-on tr.zA .y2 {
   color: var(--sg-muted) !important;
+  /* breathing room between the subject (.bog) and the snippet */
+  margin-left: 20px;
+}
+
+/* Gmail's " - " separator before the snippet; the gap above replaces it */
+html.sg-on tr.zA .y2 .Zt {
+  display: none !important;
 }
 
 /* ---------- date group labels (data-sg-group set by content.js) ---------- */
