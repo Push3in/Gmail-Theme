@@ -326,6 +326,29 @@
     if (e.key === "Escape") closeNav();
   });
 
+  // ---------- stuck row hover buttons ----------
+
+  // Gmail marks the hovered row .aqw (shows its action buttons, hides the
+  // date). Flicking the mouse off a row quickly can leave .aqw on several
+  // rows. Gmail clears it on a mouseout, so send one to any row still marked
+  // that the pointer has left.
+  function releaseStuckRows(target) {
+    for (const row of document.querySelectorAll("tr.zA.aqw")) {
+      if (target && row.contains(target)) continue;
+      row.dispatchEvent(
+        new MouseEvent("mouseout", { bubbles: true, view: window, relatedTarget: target || document.body })
+      );
+    }
+  }
+
+  document.addEventListener("mouseover", (e) => {
+    if (settings.enabled) releaseStuckRows(e.target);
+  });
+  // Pointer left the window entirely.
+  document.addEventListener("mouseout", (e) => {
+    if (settings.enabled && !e.relatedTarget) releaseStuckRows(null);
+  });
+
   // ---------- floating compose button ----------
 
   const FAB_SVG = `

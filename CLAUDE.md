@@ -21,6 +21,7 @@ Gmail's classes are obfuscated; many earlier guesses were wrong. These were conf
 - **Email list is not a real table**: `tbody` is `display:block`, each `tr.zA` is `display:flex` with ~10px top/bottom padding, and the cells are flex items (~20–26px tall). So paint row highlights on `tr.zA` itself (radius works there), never on the `td`s.
 - **Row extra spacing** = transparent `border-top/bottom` on every `td` (`--sg-row-space`). Padding/fixed heights misalign Gmail's top-pinned sender/date/hover-buttons from the subject — don't use them.
 - **Keyboard-focused row (j/k) has class `btb`**; the blue focus bar is `td.PF::before` (3px). Selected row: `.x7`. Read/unread: `.yO` / `.zE`. Date cell: `td.xW span[title]` (title = full timestamp).
+- **Hovered row has class `aqw`** (set by Gmail's JS): it hides the date `td.xW` and `td.yf`, and shows the action-button cell `td.bq4`. A fast mouse flick can leave `.aqw` stuck on several rows; a synthetic `mouseout` on the row makes Gmail clear it (`releaseStuckRows`).
 - **Search bar `header form[role="search"]`** grows to ~360px tall when focused (suggestions are inside it). Never derive layout from its height while focused.
 - **Search options panel is page-level `.ZF-Av > .SK`**, positioned by Gmail from its *default* header layout, not from the bar. It gets `--sg-search-x` / `--sg-search-w` from `placeSearch()`.
 - Toolbar: `.G-atb`. Thread layout: `table.Bs`. Thread URLs end in a long id (`#inbox/FMfcg…`).
