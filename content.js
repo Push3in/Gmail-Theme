@@ -89,19 +89,37 @@
     else el.removeAttribute("data-sg-hide");
   }
 
-  // The Terms / Privacy / storage footer: hide the largest ancestor of the
-  // policy link that doesn't also contain mail content.
+  // The Terms / Privacy / storage footer: hide the largest small ancestor of
+  // the policy link that doesn't also contain mail content. Recomputed on
+  // every scan: while search results load, the list is empty, so the walk
+  // could reach the container the results then render into; a stale tag on
+  // it hid the results.
+  const FOOTER_MAX_HEIGHT = 160;
+
   function tagFooter() {
-    for (const link of document.querySelectorAll('div[role="main"] a[href*="/policies/terms"]')) {
-      let el = link;
-      while (
-        el.parentElement &&
-        el.parentElement.getAttribute("role") !== "main" &&
-        !el.parentElement.querySelector('tr.zA, [role="listitem"], table.Bs, [role="tablist"], .G-atb')
-      ) {
-        el = el.parentElement;
+    const footers = new Set();
+    if (settings.enabled) {
+      for (const link of document.querySelectorAll('div[role="main"] a[href*="/policies/terms"]')) {
+        let el = link;
+        while (
+          el.parentElement &&
+          el.parentElement.getAttribute("role") !== "main" &&
+          el.parentElement.getBoundingClientRect().height <= FOOTER_MAX_HEIGHT &&
+          !el.parentElement.querySelector('tr.zA, [role="listitem"], table.Bs, [role="tablist"], .G-atb')
+        ) {
+          el = el.parentElement;
+        }
+        footers.add(el);
       }
-      setHidden(el, settings.enabled);
+    }
+    for (const el of document.querySelectorAll("[data-sg-footer]")) {
+      if (footers.has(el)) continue;
+      el.removeAttribute("data-sg-footer");
+      setHidden(el, false);
+    }
+    for (const el of footers) {
+      el.setAttribute("data-sg-footer", "");
+      setHidden(el, true);
     }
   }
 
