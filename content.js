@@ -144,11 +144,32 @@
     if (el !== compose) el.setAttribute("data-sg-nav", "");
   }
 
-  // Gmail themes can be light or dark; read it from the mail text colour.
+  // Gmail themes can be light or dark. Read it from the page background
+  // (.wl: #f8fafd light, #111 dark); the mail text colour stays dark in
+  // Gmail's dark theme, so it can't be used. Picture themes have no solid
+  // background, so fall back to the header text colour.
   function detectGmailTheme() {
-    const sample = document.querySelector('div[role="main"]') || document.body;
-    const [r, g, b] = getComputedStyle(sample).color.match(/\d+/g).map(Number);
-    root.classList.toggle("sg-gmail-dark", (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5);
+    const lightness = (color) => {
+      const [r, g, b, a = 1] = color.match(/[\d.]+/g).map(Number);
+      return { value: (0.299 * r + 0.587 * g + 0.114 * b) / 255, opaque: a === 1 };
+    };
+    const bg = lightness(getComputedStyle(document.querySelector(".wl") || document.body).backgroundColor);
+    const dark = bg.opaque
+      ? bg.value < 0.5
+      : lightness(getComputedStyle(document.querySelector("header") || document.body).color).value > 0.5;
+    root.classList.toggle("sg-gmail-dark", dark);
+
+    // Even in its dark theme Gmail paints the open email white (.iY); tag
+    // that card so the CSS can flip it to match the chosen theme.
+    let card = dark && isThreadView() ? mailCard() : null;
+    if (card) {
+      const paint = lightness(getComputedStyle(card).backgroundColor);
+      if (!paint.opaque || paint.value < 0.5) card = null;
+    }
+    for (const el of document.querySelectorAll("[data-sg-light-mail]")) {
+      if (el !== card) el.removeAttribute("data-sg-light-mail");
+    }
+    if (card && !card.hasAttribute("data-sg-light-mail")) card.setAttribute("data-sg-light-mail", "");
   }
 
   function setVar(name, value) {

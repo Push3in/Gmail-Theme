@@ -451,19 +451,47 @@ html.sg-on.sg-fab-on #sg-compose:focus-visible {
  * reverse, in reverse order, so photos and logos look as they should; a
  * plain invert(1) on media couldn't undo invert(0.92) and left them washed
  * out.
- * Skipped when Gmail's own theme is already dark (sg-gmail-dark), where
- * inverting would turn the page light again.
+ * Applied whenever the chosen theme (sg-dark = Dark) differs from Gmail's
+ * own theme (sg-gmail-dark): Dark over a light Gmail theme, and Light over a
+ * dark one, so the popup's choice always wins.
  */
-html.sg-on.sg-dark:not(.sg-gmail-dark) {
+html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) {
   filter: invert(1) contrast(0.84) hue-rotate(180deg);
-  background: #ffffff;
+  background: var(--sg-panel);
 }
 
-html.sg-on.sg-dark:not(.sg-gmail-dark) :is(img, video, picture, canvas, iframe, [style*="background-image"], #sg-compose svg) {
+html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) :is(img, video, picture, canvas, iframe, [style*="background-image"], #sg-compose svg) {
   filter: hue-rotate(180deg) contrast(1.1905) invert(1);
 }
 
 /* Media inside media (e.g. an <img> in a <picture>) must not be restored twice */
-html.sg-on.sg-dark:not(.sg-gmail-dark) :is(picture, [style*="background-image"]) :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
+html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) :is(picture, [style*="background-image"]) :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
   filter: none;
+}
+
+/*
+ * The open email in Gmail's dark theme: Gmail still paints it white
+ * (content.js tags it [data-sg-light-mail]). Dark: invert just the card and
+ * restore its media. Light: the page is inverted, so the card would turn
+ * dark; give it the exact reverse and leave its media alone (it is already
+ * back to normal with the card).
+ */
+html.sg-on.sg-gmail-dark.sg-dark [data-sg-light-mail] {
+  filter: invert(1) contrast(0.84) hue-rotate(180deg);
+}
+
+html.sg-on.sg-gmail-dark.sg-dark [data-sg-light-mail] :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
+  filter: hue-rotate(180deg) contrast(1.1905) invert(1);
+}
+
+html.sg-on.sg-gmail-dark.sg-dark [data-sg-light-mail] :is(picture, [style*="background-image"]) :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
+  filter: none;
+}
+
+html.sg-on.sg-gmail-dark:not(.sg-dark) [data-sg-light-mail] {
+  filter: hue-rotate(180deg) contrast(1.1905) invert(1);
+}
+
+html.sg-on.sg-gmail-dark:not(.sg-dark) [data-sg-light-mail] :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
+  filter: none !important;
 }
