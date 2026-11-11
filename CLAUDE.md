@@ -26,6 +26,7 @@ Gmail's classes are obfuscated; many earlier guesses were wrong. These were conf
 - **Search options panel is page-level `.ZF-Av > .SK`**, positioned by Gmail from its *default* header layout, not from the bar. It gets `--sg-search-x` / `--sg-search-w` from `placeSearch()`.
 - **Open email card is `div.nH.a98.iY`**, and Gmail paints it white (`.iY{background:#fff}`, light tokens on `.bkL .a98`) even in its dark theme. `detectGmailTheme` tags it `data-sg-light-mail` so it gets its own invert.
 - Toolbar: `.G-atb`. Thread layout: `table.Bs`. Thread URLs end in a long id (`#inbox/FMfcg…`).
+- **Attachment/PDF viewer is page-level `.aLF-aPX`** (child of `body`) and has its own `div[role="main"]` (`.aLF-aPX-aPF`). Exclude it from `div[role="main"]` rules (`:not(.aLF-aPX *)`), or the 1200px column cap clips the preview (Nov 2026).
 - Some header items are matched by English `aria-label` (Main menu, Support, Advanced search options).
 
 ## Design decisions (and why)

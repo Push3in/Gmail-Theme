@@ -44,7 +44,7 @@ html.sg-on.sg-gmail-dark {
 
 html.sg-on .bkK,
 html.sg-on .bkK > .nH,
-html.sg-on div[role="main"],
+html.sg-on div[role="main"]:not(.aLF-aPX *),
 html.sg-on .aeF,
 html.sg-on .nH.ar4 {
   background: transparent !important;
@@ -158,7 +158,10 @@ html.sg-on [data-sg-hide] {
 
 /* ---------- centered content column ---------- */
 
-html.sg-on div[role="main"] {
+/* Gmail's attachment viewer (.aLF-aPX, a page-level overlay) also has a
+   role=main container; capping its width clipped PDF previews (Nov 2026). */
+
+html.sg-on div[role="main"]:not(.aLF-aPX *) {
   width: 100% !important;
   max-width: var(--sg-width) !important;
   margin-left: auto !important;
@@ -185,7 +188,7 @@ html.sg-on div[role="main"] {
   }
 }
 
-html.sg-on div[role="main"] {
+html.sg-on div[role="main"]:not(.aLF-aPX *) {
   animation: sg-enter var(--sg-spring-enter-duration) var(--sg-spring-enter) backwards;
 }
 
