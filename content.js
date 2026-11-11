@@ -64,7 +64,9 @@
 
   // Thread URLs end in a long opaque id: #inbox/FMfcgz…, #label/Work/FMfcgz…
   function isThreadView() {
-    const parts = location.hash.slice(1).split("/");
+    // Ignore a query like "?projector=1" (attachment viewer open), or the open
+    // email loses its theme and flashes white behind the viewer.
+    const parts = location.hash.slice(1).split("?")[0].split("/");
     return parts.length > 1 && /^[A-Za-z0-9]{16,}$/.test(parts[parts.length - 1]);
   }
 
