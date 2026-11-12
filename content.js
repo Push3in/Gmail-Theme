@@ -16,7 +16,14 @@
     width: "normal", // "narrow" | "normal" | "wide"
     rowSpace: "comfy", // "tight" | "comfy" | "roomy"
   };
-  const WIDTHS = { narrow: "960px", normal: "1200px", wide: "1440px" };
+  // Column width scales with the window so big screens (4K) don't feel cramped.
+  // Each size is a share of the window, kept between a floor and a ceiling;
+  // on a 1920px-wide window they land near the old 960 / 1200 / 1440px.
+  const WIDTHS = {
+    narrow: "clamp(760px, 50vw, 1600px)",
+    normal: "clamp(960px, 62vw, 2000px)",
+    wide: "clamp(1200px, 76vw, 2600px)",
+  };
   // Added above and below each row, on top of Gmail's own row height
   // (so each row grows by twice this).
   const ROW_SPACE = { tight: "0px", comfy: "3px", roomy: "5px" };

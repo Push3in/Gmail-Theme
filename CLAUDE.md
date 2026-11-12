@@ -39,7 +39,7 @@ Gmail's classes are obfuscated; many earlier guesses were wrong. These were conf
 - **Footer hiding is recomputed every scan** (`tagFooter`, `data-sg-footer`) and capped at 160px tall. While search results load the list is empty, so the walk up from the policy link reached the results container; the stale `data-sg-hide` left on it hid all search results (Oct 2026).
 - **Dark mode = root `filter: invert(1) contrast(.84) hue-rotate(180deg)`**, media gets the exact reverse in reverse order. Applied only when the popup's choice (`.sg-dark`) differs from Gmail's own theme (`.sg-gmail-dark`, detected from the `.wl` page background: `#f8fafd` light, `#111` dark; header text colour as fallback for picture themes. NOT from `div[role=main]` text colour — it stays dark `rgb(32,33,36)` in Gmail's dark theme, verified Oct 2026), so Light over a dark Gmail theme inverts too. Earlier it just skipped inversion on dark Gmail themes, so the popup's Light/Dark looked swapped (Oct 2026). Saturated colours still lose some saturation — inherent to the approach.
 - Theme colours come from CSS vars; `.sg-gmail-dark` swaps them to match Gmail's dark themes.
-- Defaults the user chose: toolbar always visible, checkbox/star always visible, drag-handle dots kept, Normal width 1200px, Comfy rows.
+- Defaults the user chose: toolbar always visible, checkbox/star always visible, drag-handle dots kept, Normal width (62% of the window, 960–2000px; Narrow 50%, Wide 76%); open email 37.5% (1000–1400px), Comfy rows.
 
 ## Debugging against real Gmail
 

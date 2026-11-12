@@ -14,8 +14,8 @@
  */
 
 html.sg-on {
-  --sg-width: 1200px;
-  --sg-thread-width: 900px;
+  --sg-width: clamp(960px, 62vw, 2000px); /* Normal; content.js sets the chosen size */
+  --sg-thread-width: clamp(1000px, 37.5vw, 1400px); /* open email: grows on big screens, capped for readable lines */
   --sg-panel: #ffffff;
   --sg-muted: #80868b;
   --sg-read: #5f6368;
