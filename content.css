@@ -25,6 +25,7 @@ html.sg-on {
   --sg-selected: #e8f0fe;
   --sg-accent: #d93025;
   --sg-fab: #ffffff;
+  --sg-card: #ffffff; /* the inbox / open-email card on the tinted page */
 }
 
 /* Gmail's own dark theme (detected by content.js from the text colour) */
@@ -38,13 +39,13 @@ html.sg-on.sg-gmail-dark {
   --sg-selected: rgba(138, 180, 248, 0.18);
   --sg-accent: #f28b82;
   --sg-fab: #2d2e30;
+  --sg-card: #1f1f1f;
 }
 
-/* ---------- canvas: one flat surface in Gmail's theme colour ---------- */
+/* ---------- canvas: tinted page with one card for the list / open email ---------- */
 
 html.sg-on .bkK,
 html.sg-on .bkK > .nH,
-html.sg-on div[role="main"]:not(.aLF-aPX *),
 html.sg-on .aeF,
 html.sg-on .nH.ar4 {
   background: transparent !important;
@@ -52,10 +53,32 @@ html.sg-on .nH.ar4 {
   border-radius: 0 !important;
 }
 
+/* The card runs to the bottom of the window, so only the top corners round.
+   --sg-card-radius minus --sg-card-pad gives the inner corners (below), so the
+   gap between the two layers stays even around the corners. */
+html.sg-on {
+  --sg-card-radius: 16px;
+  --sg-card-pad: 8px;
+}
+
+html.sg-on div[role="main"]:not(.aLF-aPX *) {
+  background: var(--sg-card) !important;
+  box-shadow: none !important;
+  border-radius: var(--sg-card-radius) var(--sg-card-radius) 0 0 !important;
+  padding: var(--sg-card-pad) var(--sg-card-pad) 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Gmail's open-email box sits inside the card with its own ~16px corners;
+   nest them properly. */
+html.sg-on div[role="main"] .nH.a98 {
+  border-radius: calc(var(--sg-card-radius) - var(--sg-card-pad)) calc(var(--sg-card-radius) - var(--sg-card-pad)) 0 0 !important;
+}
+
 /* ---------- header: menu, centered search, avatar ---------- */
 
 html.sg-on header {
-  border-bottom: 1px solid var(--sg-line) !important;
+  border-bottom: 0 !important;
 }
 
 /* Gmail logo, Google apps grid, Support, Gemini, Upgrade */
@@ -78,11 +101,11 @@ html.sg-on header [data-tooltip*="Gemini" i] {
  * right side loads; auto margins (before content.js measures) would.
  */
 html.sg-on header form[role="search"] {
-  width: min(560px, calc(100vw - 360px)) !important;
+  width: min(660px, calc(100vw - 360px)) !important;
   max-width: none !important;
   margin-left: var(--sg-search-left, auto) !important;
   margin-right: 0 !important;
-  border-radius: 8px !important;
+  border-radius: 24px !important;
 }
 
 /* Search options panel (filter icon): lives at page level, so line it up
@@ -354,7 +377,7 @@ html.sg-on tr.zA .y2 .Zt {
  */
 html.sg-on tr.zA[data-sg-group] {
   position: relative;
-  margin-top: 48px;
+  margin-top: 40px;
 }
 
 html.sg-on tr.zA[data-sg-group]::before {
@@ -364,12 +387,11 @@ html.sg-on tr.zA[data-sg-group]::before {
   right: 0;
   bottom: 100%;
   box-sizing: border-box;
-  height: 48px;
-  padding: 20px 0 8px 12px;
-  border-bottom: 1px solid var(--sg-line);
+  height: 40px;
+  padding: 18px 0 8px 16px;
   white-space: nowrap;
   pointer-events: none;
-  font: 500 13px/1 "Google Sans", Roboto, Arial, sans-serif;
+  font: 500 12px/1 "Google Sans", Roboto, Arial, sans-serif;
   color: var(--sg-muted);
 }
 
@@ -378,6 +400,13 @@ html.sg-on tr.zA[data-sg-group]::before {
 html.sg-on table.Bs {
   max-width: var(--sg-thread-width) !important;
   margin: 0 auto !important;
+}
+
+/* Gmail paints the open email white of its own; let the card show through so
+   it matches the list. Light Gmail theme only: in Gmail's dark theme
+   detectGmailTheme reads this white to tag [data-sg-light-mail] for flipping. */
+html.sg-on:not(.sg-gmail-dark) div[role="main"] .nH.a98.iY {
+  background: transparent !important;
 }
 
 /* Right-hand column next to a thread (contacts card, ads) */
@@ -463,8 +492,33 @@ html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) {
   background: var(--sg-panel);
 }
 
+/*
+ * Under the invert, a colour v ends up as 0.84 * (1 - v) + 0.08. A white card
+ * on Gmail's #f8fafd page would come out darker than the page, the reverse of
+ * the design, so the card is picked pre-invert to land lighter:
+ *  - Dark over light Gmail: page #f8fafd -> ~#1a1a1a, card #ebebeb -> ~#252525.
+ *  - Light over dark Gmail: card #000 -> #ebebeb (the brightest the invert
+ *    can reach), Gmail's own #111 page -> #dcdcdc around it.
+ * Never repaint the page (.wl / body) here: detectGmailTheme reads Gmail's
+ * theme from .wl, and a forced colour locked it into the wrong theme
+ * (unread text went near-black, Nov 2026).
+ */
+html.sg-on.sg-dark:not(.sg-gmail-dark) {
+  --sg-card: #ebebeb;
+}
+
+html.sg-on.sg-gmail-dark:not(.sg-dark) {
+  --sg-card: #000000;
+}
+
 html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) :is(img, video, picture, canvas, iframe, [style*="background-image"], #sg-compose svg) {
   filter: hue-rotate(180deg) contrast(1.1905) invert(1);
+}
+
+/* Gmail's coloured notices in an open email (tagged by content.js): undo the
+   contrast softening so their text is crisp instead of grey on the colour. */
+html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) [data-sg-vivid] {
+  filter: contrast(1.1905);
 }
 
 /* Media inside media (e.g. an <img> in a <picture>) must not be restored twice */

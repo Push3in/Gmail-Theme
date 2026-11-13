@@ -245,6 +245,32 @@
     return card || main;
   }
 
+  // Gmail's coloured notices in an open email (e.g. the yellow "Encrypted
+  // attachment warning"). Under the dark-mode invert their text comes out a
+  // muted grey on the strong colour, so tag them by colour (class names are
+  // obfuscated) and the CSS skips the contrast softening for them. Only Gmail's
+  // own UI is checked, never the email's content (.a3s).
+  function tagVividNotices() {
+    const inverted = root.classList.contains("sg-dark") !== root.classList.contains("sg-gmail-dark");
+    const found = new Set();
+    if (inverted && isThreadView()) {
+      for (const el of document.querySelectorAll('div[role="main"] div')) {
+        if (el.closest(".a3s") || el.childElementCount > 8) continue;
+        const m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+        if (!m || (m[3] !== undefined && Number(m[3]) < 1)) continue;
+        const [r, g, b] = m.map(Number);
+        if (Math.max(r, g, b) - Math.min(r, g, b) < 40) continue; // greys and near-greys
+        const box = el.getBoundingClientRect();
+        if (box.height > 160 || box.width < 200) continue; // banners, not panels or chips
+        found.add(el);
+      }
+    }
+    for (const el of document.querySelectorAll("[data-sg-vivid]")) {
+      if (!found.has(el)) el.removeAttribute("data-sg-vivid");
+    }
+    for (const el of found) if (!el.hasAttribute("data-sg-vivid")) el.setAttribute("data-sg-vivid", "");
+  }
+
   // In a list view: Gmail's main region holding the visible conversation rows.
   function listBox() {
     const row = [...document.querySelectorAll('div[role="main"] tr.zA')].find(isVisible);
@@ -445,6 +471,7 @@
       ensureFab();
       updateViewClasses();
       detectGmailTheme();
+      tagVividNotices();
       placeSearch();
       tagNav();
       tagFooter();
