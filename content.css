@@ -108,6 +108,19 @@ html.sg-on header form[role="search"] {
   border-radius: 24px !important;
 }
 
+/*
+ * Gmail fades the search bar's background over ~100ms when it opens and
+ * closes, but shows and hides the suggestions instantly. So for a few frames
+ * a grey bar sat on the white suggestions (opening) and a blank white pill
+ * flashed after they closed (closing); screen recording, Nov 2026. Snap the
+ * colour change instead. Colours are left to Gmail: earlier attempts to
+ * recolour the focused box with a filter caused worse flashes.
+ */
+html.sg-on header form[role="search"],
+html.sg-on header form[role="search"] * {
+  transition: none !important;
+}
+
 /* Search options panel (filter icon): lives at page level, so line it up
    with the bar using the position content.js measured */
 html.sg-on .ZF-Av:has(> .SK) {
@@ -138,17 +151,18 @@ html.sg-on .aqn:has(a),
 html.sg-on [data-sg-nav] {
   display: block !important;
   position: fixed !important;
-  top: var(--sg-header-bottom, 64px);
-  left: 0;
-  bottom: 0;
+  /* A floating card, same colour and corners as the list card */
+  top: calc(var(--sg-header-bottom, 64px) + var(--sg-card-pad));
+  left: var(--sg-card-pad);
+  bottom: var(--sg-card-pad);
   width: 256px !important;
   z-index: 1000;
   overflow-y: auto;
   overscroll-behavior: contain;
-  background: var(--sg-panel) !important;
-  border-radius: 0 12px 0 0;
+  background: var(--sg-card) !important;
+  border-radius: var(--sg-card-radius);
   padding-top: 8px;
-  transform: translateX(-100%);
+  transform: translateX(calc(-100% - var(--sg-card-pad) - 24px));
   visibility: hidden;
   box-shadow: none;
   will-change: transform;
@@ -162,7 +176,7 @@ html.sg-on.sg-nav-open .aqn:has(a),
 html.sg-on.sg-nav-open [data-sg-nav] {
   transform: none;
   visibility: visible;
-  box-shadow: 1px 0 0 var(--sg-line), 8px 0 24px -16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 0 1px var(--sg-line), 0 12px 32px -8px rgba(0, 0, 0, 0.25);
   transition:
     transform var(--sg-spring-panel-duration) var(--sg-spring-panel),
     box-shadow var(--sg-spring-panel-duration) var(--sg-spring-panel),
@@ -519,6 +533,29 @@ html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) :is(im
    contrast softening so their text is crisp instead of grey on the colour. */
 html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) [data-sg-vivid] {
   filter: contrast(1.1905);
+}
+
+/*
+ * Compose keeps its real colours: the invert turned Gmail's light-blue button
+ * near-white in Dark and its dark-blue one near-black in Light. Give it the
+ * same reverse filter as media and paint the design's colours directly.
+ */
+html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) :is(.T-I.T-I-KE.L3, [gh="cm"]) {
+  filter: hue-rotate(180deg) contrast(1.1905) invert(1);
+}
+
+html.sg-on:is(.sg-dark:not(.sg-gmail-dark), .sg-gmail-dark:not(.sg-dark)) :is(.T-I.T-I-KE.L3, [gh="cm"]) :is(img, video, picture, canvas, iframe, [style*="background-image"]) {
+  filter: none !important;
+}
+
+html.sg-on.sg-dark:not(.sg-gmail-dark) :is(.T-I.T-I-KE.L3, [gh="cm"]) {
+  background: #004a77 !important;
+  color: #c2e7ff !important;
+}
+
+html.sg-on.sg-gmail-dark:not(.sg-dark) :is(.T-I.T-I-KE.L3, [gh="cm"]) {
+  background: #c2e7ff !important;
+  color: #001d35 !important;
 }
 
 /* Media inside media (e.g. an <img> in a <picture>) must not be restored twice */

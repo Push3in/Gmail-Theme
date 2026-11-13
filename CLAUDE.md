@@ -49,6 +49,8 @@ Gmail's classes are obfuscated; many earlier guesses were wrong. These were conf
 - Background tabs pause `requestAnimationFrame` and CSS transitions: extension scans and animated values won't update there. Measure with `transition:none`, or bring the tab forward.
 - To test CSS changes before the user reloads, inject `springs.css + content.css` as a temporary `<style>` in the page, measure, then remove it. The page may still have the *old* extension CSS loaded — neutralise conflicting old rules in the test.
 - Gmail opens search suggestions only on a real (trusted) click, not on `input.focus()`.
+- **Search bar flash** = Gmail's ~100ms background fade on the bar vs its instant suggestions; fixed with `transition: none` on the form. Don't recolour the focused search box with `filter` — tried twice, both flashed worse (Nov 2026).
+- The user also browses in **Ardia** (Chromium). Its AppleScript `execute javascript` (View → Developer → Allow JavaScript from Apple Events) is blocked on Gmail by Trusted Types (`EvalError`), even for `1+1`. To measure Gmail there, add a temporary recorder to `content.js` that writes its result into `document.title`, read it with `title of tab`, then remove the recorder (Nov 2026).
 
 ## Working rules
 
