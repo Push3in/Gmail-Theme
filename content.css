@@ -152,7 +152,7 @@ html.sg-on [data-sg-nav] {
   display: block !important;
   position: fixed !important;
   /* A floating card, same colour and corners as the list card */
-  top: calc(var(--sg-header-bottom, 64px) + var(--sg-card-pad));
+  top: var(--sg-card-top, calc(var(--sg-header-bottom, 64px) + var(--sg-card-pad)));
   left: var(--sg-card-pad);
   bottom: var(--sg-card-pad);
   width: 256px !important;

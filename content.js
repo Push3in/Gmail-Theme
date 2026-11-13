@@ -206,6 +206,9 @@
     setVar("--sg-search-w", `${Math.round(box.width)}px`);
     // The slide-over menu opens just below the header.
     setVar("--sg-header-bottom", `${Math.round(header.getBoundingClientRect().bottom)}px`);
+    // Top of the list / open-email card, so the slide-over menu card lines up with it.
+    const main = [...document.querySelectorAll('div[role="main"]')].find((el) => !el.closest(".aLF-aPX") && isVisible(el));
+    if (main) setVar("--sg-card-top", `${Math.round(main.getBoundingClientRect().top)}px`);
   }
 
   // The narrow Mail / Chat / Meet app rail on the far left.
