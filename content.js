@@ -17,12 +17,16 @@
     rowSpace: "comfy", // "tight" | "comfy" | "roomy"
   };
   // Column width scales with the window so big screens (4K) don't feel cramped.
-  // Each size is a share of the window, kept between a floor and a ceiling;
-  // on a 1920px-wide window they land near the old 960 / 1200 / 1440px.
+  // Each size is a straight line through two tuned points:
+  // a ~1512px laptop window and a ~3200px 4K monitor (120% scaling).
+  //            laptop   monitor
+  //   narrow    860      1400
+  //   normal    960      1600
+  //   wide     1150      2000
   const WIDTHS = {
-    narrow: "clamp(760px, 50vw, 1600px)",
-    normal: "clamp(960px, 62vw, 2000px)",
-    wide: "clamp(1200px, 76vw, 2600px)",
+    narrow: "calc(376px + 32vw)",
+    normal: "calc(387px + 37.9vw)",
+    wide: "calc(390px + 50.25vw)",
   };
   // Added above and below each row, on top of Gmail's own row height
   // (so each row grows by twice this).
